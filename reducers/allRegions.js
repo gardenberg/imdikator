@@ -1,4 +1,4 @@
-import {RECEIVE_ALL_REGIONS} from '../actions/actions'
+import {RECEIVE_ALL_REGIONS} from '../actions/ActionTypes'
 
 export default function allRegions(state = [], action) {
   switch (action.type) {

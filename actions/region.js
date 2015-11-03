@@ -1,33 +1,45 @@
-import apiClient from '../config/apiClient'
-import {RECEIVE_ALL_REGIONS, REQUEST_REGION, RECEIVE_REGION} from './actions'
+import {SET_CURRENT_REGION, REGION_NOT_FOUND} from './ActionTypes'
 
-export function loadAllRegions() {
-  return (dispatch, state) => {
+/** Action creators */
+function _setCurrentRegion(region) {
+  return {
+    type: SET_CURRENT_REGION,
+    region: region
+  }
+}
 
-    if (state.allRegions) {
+function regionNotFound(code) {
+  return {
+    type: REGION_NOT_FOUND,
+    code: code
+  }
+}
+
+/* actions */
+export function setCurrentRegionByCode(regionCode) {
+  return (dispatch, getState) => {
+    const {currentRegion, allRegions} = getState()
+    if (currentRegion && currentRegion.code == regionCode) {
       return
     }
 
-    apiClient.getAllRegions().then(regions => {
-      dispatch({
-        type: RECEIVE_ALL_REGIONS,
-        regions
-      })
-    })
+    const foundRegion = allRegions.find(region => region.prefixedCode.toLowerCase() === regionCode.toLowerCase())
+
+    if (!foundRegion) {
+      dispatch(regionNotFound(regionCode))
+      return
+    }
+
+    dispatch(setCurrentRegion(foundRegion))
   }
 }
-export function loadRegionByCode(regionCode) {
-  return (dispatch, state) => {
-    dispatch({
-      type: REQUEST_REGION,
-      regionCode
-    })
-    return apiClient.getRegionByCode(regionCode)
-      .then(region => {
-        dispatch({
-          type: RECEIVE_REGION,
-          region
-        })
-      })
+
+export function setCurrentRegion(region) {
+  return (dispatch, getState) => {
+    const {currentRegion} = getState()
+    if (currentRegion === region) {
+      return
+    }
+    dispatch(_setCurrentRegion(region))
   }
 }

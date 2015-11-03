@@ -1,14 +1,18 @@
-import {NAVIGATE} from './actions'
-import {loadRegionByCode} from './region'
+import {REGION_NOT_FOUND, NAVIGATE} from './ActionTypes'
+import {setCurrentRegion, setCurrentRegionByCode} from './region'
 
-/* Action creators */
 export function navigate(match = {}) {
   return dispatch => {
-    const {params} = match
-    if (params.region) {
-      const prefixedRegionCode = params.region.split('-')[0].toUpperCase()
-      dispatch(loadRegionByCode(prefixedRegionCode))
+
+    if (match.params.region) {
+      dispatch(setCurrentRegionByCode(match.params.region))
     }
+
+    // TODO:
+    // check if there is a region, dispatch a selectRegion action
+    // check if there is a cardPage, dispatch a selectCardPage action
+    // check if there is a tab, dispatch a selectTab actin
+    // check if there is a tab, dispatch a selectTab action
     dispatch({
       type: NAVIGATE,
       match

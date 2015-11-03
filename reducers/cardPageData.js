@@ -1,4 +1,4 @@
-import {RECEIVE_CARD_PAGE_DATA, NAVIGATE} from '../actions/actions'
+import {RECEIVE_CARD_PAGE_DATA, NAVIGATE} from '../actions/ActionTypes'
 
 export default function cardPageData(state = null, action) {
   switch (action.type) {

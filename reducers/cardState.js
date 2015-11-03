@@ -1,4 +1,4 @@
-import {RECEIVE_QUERY_RESULT} from '../actions/actions'
+import {RECEIVE_QUERY_RESULT} from '../actions/ActionTypes'
 
 export default function cardPage(state = {}, action) {
   switch (action.type) {

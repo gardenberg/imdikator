@@ -1,15 +1,9 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {loadAllRegions} from '../../actions/region'
-import {
-  isSimilarRegion,
-  norway
-} from '../../lib/regionUtil'
-import RegionSummaryChart from '../containers/RegionSummaryChart'
-import RegionChildList from '../elements/RegionChildList'
-import RegionSearch from '../containers/RegionSearch'
-import chartQueries from '../../data/regionPageQueries'
-
+import {isSimilarRegion, norway} from '../../lib/regionUtil'
+import RegionSummaryChartsContainer from '../containers/RegionSummaryChartsContainer'
+import RegionChildListContainer from '../containers/RegionChildListContainer'
+import RegionSearchContainer from '../containers/RegionSearchContainer'
 
 class IndexPage extends Component {
 
@@ -26,12 +20,12 @@ class IndexPage extends Component {
   }
 
 
-  componentWillMount() {
-    this.props.dispatch(loadAllRegions())
+  handleSelectRegion(region) {
+    this.context.goTo(this.createLinkToRegion(region))
   }
 
-  handleSelectRegion(region) {
-    this.context.goTo('/steder/:region', {region: region.prefixedCode})
+  createLinkToRegion(region) {
+    return this.context.linkTo('/steder/:region', {region: region.prefixedCode})
   }
 
   render() {
@@ -69,12 +63,7 @@ class IndexPage extends Component {
                 <h2 className="page__section-title">Oppsummering</h2>
                 <div className="col-block-bleed--full-right col-block-bleed--inline-mobile">
                   <div className="row">
-                    {chartQueries.map(chartQuery => {
-                      const key = `${chartQuery.query.tableName}-${chartQuery.query.unit[0]}`
-                      return (
-                        <RegionSummaryChart key={key} comparableRegionCodes={comparableRegionCodes} region={region} chartQuery={chartQuery} />
-                      )
-                    })}
+                    <RegionSummaryChartsContainer region={region}/>
                   </div>
                 </div>
 
@@ -102,7 +91,7 @@ class IndexPage extends Component {
                 <section className="feature feature--white">
                   <div>
                     <span>Finn område: </span>
-                    <RegionSearch onSelect={this.handleSelectRegion.bind(this)}/>
+                    <RegionSearchContainer onSelect={this.handleSelectRegion.bind(this)}/>
                   </div>
                 </section>
               </div>
@@ -115,7 +104,7 @@ class IndexPage extends Component {
             <div className="row">
               <div className="col--main">
                 <section className="feature feature--white">
-                  <RegionChildList region={region} allRegions={allRegions}/>
+                  <RegionChildListContainer region={region} createLinkToRegion={this.createLinkToRegion.bind(this)}/>
                 </section>
               </div>
             </div>

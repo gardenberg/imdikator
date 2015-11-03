@@ -1,17 +1,26 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
 
 class App extends Component {
   static propTypes = {
-    route: PropTypes.object,
-    router: PropTypes.object,
-    dispatch: PropTypes.func,
-    cardPages: PropTypes.array
+    component: PropTypes.func.isRequired,
+    router: ImdiPropTypes.router.isRequired,
+    breadCrumbs: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+        title: PropTypes.string
+      })
+    )
   }
 
   static childContextTypes = {
     linkTo: PropTypes.func,
     goTo: PropTypes.func
+  }
+
+  static defaultProps = {
+    breadCrumbs: []
   }
 
   getChildContext() {
@@ -25,11 +34,10 @@ class App extends Component {
   }
 
   renderBreadCrumbs() {
-    if (!this.props.route) {
+    const {breadCrumbs} = this.props
+    if (!breadCrumbs) {
       return null
     }
-    const url = this.props.route.url
-    const segments = url.split('/').slice(1).filter(Boolean)
     return (
       <nav className="breadcrumbs">
         <ul className="t-no-list-styles breadcrumbs__list">
@@ -37,24 +45,21 @@ class App extends Component {
             <a href="/" className="breadcrumbs__link">Tall og statistikk</a>
             <span className="breadcrumbs__divider">/</span>
           </li>
-          {segments.map((segment, i) => {
-            return (
-              <li key={segment + i} className="breadcrumbs__list-item">
-                <a href={'/' + segments.slice(0, i + 1).join('/')} className="breadcrumbs__link">
-                  {segment}
-                </a>
-                <span className="breadcrumbs__divider">/</span>
-              </li>
-            )
-          })}
+          {breadCrumbs.map(crumb => (
+          <li key={crumb.url} className="breadcrumbs__list-item">
+            <a href={crumb.url} className="breadcrumbs__link">
+              {crumb.title}
+            </a>
+            <span className="breadcrumbs__divider">/</span>
+          </li>
+            ))}
         </ul>
       </nav>
     )
   }
 
+
   render() {
-    // Injected by connect() call:
-    const {route} = this.props
     return (
       <div>
         <div className="page__content page__content--section">
@@ -66,7 +71,7 @@ class App extends Component {
             </div>
           </div>
         </div>
-        <route.handler dispatch={this.props.dispatch} route={route}/>
+        {this.props.component && <this.props.component/>}
       </div>
     )
   }
@@ -76,8 +81,8 @@ class App extends Component {
 // Note: use https://github.com/faassen/reselect for better performance.
 function select(state) {
   return {
-    route: state.route,
-    cardPages: state.cardPages
+    component: state.page,
+    breadCrumbs: state.breadCrumbs
   }
 }
 

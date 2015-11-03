@@ -3,19 +3,8 @@ import resolveQuery from '../lib/resolveQuery'
 import {queryResultPresenter} from '../lib/queryResultPresenter'
 import {prefixifyRegion, isSimilarRegion} from '../lib/regionUtil'
 import {TABS} from '../config/tabs'
-import {RECEIVE_REGION, RECEIVE_ALL_REGIONS, RECEIVE_CARD_PAGE_DATA, RECEIVE_QUERY_RESULT, RECEIVE_CARD_PAGES, RECEIVE_TABLE_HEADERS} from './actions'
+import {RECEIVE_REGION, RECEIVE_QUERY_RESULT, RECEIVE_TABLE_HEADERS} from './ActionTypes'
 
-
-export function loadCardPages() {
-  return dispatch => {
-    apiClient.getCardPages().then(cardPages => {
-      dispatch({
-        type: RECEIVE_CARD_PAGES,
-        cardPages
-      })
-    })
-  }
-}
 
 export function performQuery(card, tab, userQuery) {
   return (dispatch, getState) => {
@@ -41,7 +30,9 @@ export function performQuery(card, tab, userQuery) {
 }
 
 export function loadCardPageData({regionCode, pageName, activeCardName, activeTabName, query}) {
-  return dispatch => {
+  return (dispatch, getState) => {
+
+    const {allRegions, cardPages} = getState()
 
     const getRegion = apiClient.getRegionByCode(regionCode)
     getRegion.then(region => {
@@ -50,26 +41,6 @@ export function loadCardPageData({regionCode, pageName, activeCardName, activeTa
         region
       })
     })
-
-    const getAllRegions = apiClient.getAllRegions()
-    getAllRegions.then(regions => {
-      dispatch({
-        type: RECEIVE_ALL_REGIONS,
-        regions
-      })
-    })
-
-    const getCardPageData = apiClient.getCardPageByName(pageName)
-    getCardPageData.then(cardPageData => {
-      dispatch({
-        type: RECEIVE_CARD_PAGE_DATA,
-        cardPageData
-      })
-    })
-
-    if (!activeCardName) {
-      return
-    }
 
     const getActiveCard = getCardPageData.then(cardPageData => {
       return cardPageData.cards.find(card => card.name === activeCardName)
@@ -98,11 +69,9 @@ export function loadCardPageData({regionCode, pageName, activeCardName, activeTa
         if (activeTabName !== 'benchmark') {
           return aQuery
         }
-        return getAllRegions.then(allRegions => {
-          const comparisonRegions = allRegions.filter(isSimilarRegion(region)).map(reg => reg.prefixedCode)
-          const queryWithComparisons = Object.assign({}, aQuery, {comparisonRegions: comparisonRegions})
-          return queryWithComparisons
-        })
+        const comparisonRegions = allRegions.filter(isSimilarRegion(region)).map(reg => reg.prefixedCode)
+        const queryWithComparisons = Object.assign({}, aQuery, {comparisonRegions: comparisonRegions})
+        return queryWithComparisons
       })
 
     const getQueryResults = queryResolved.then(resolvedQuery => {

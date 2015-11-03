@@ -3,7 +3,7 @@ import Card from '../containers/Card'
 import {connect} from 'react-redux'
 import {loadCardPageData} from '../../actions/cardPages'
 import {openCard, closeCard} from '../../actions/cards'
-import CardPageButtons from '../containers/CardPageButtons'
+import CardPageButtonsContainer from '../containers/CardPageButtonsContainer'
 import RegionQuickSwitch from '../containers/RegionQuickSwitch'
 import RegionInfo from '../elements/RegionInfo'
 import {_t} from '../../lib/translate'
@@ -95,7 +95,7 @@ class CardsPage extends Component {
                   <h1>Integreringen i {region.name} {_t(region.type)}</h1>
                   <p className="ingress">Tall og statistikk over integreringen i {_t('the-' + region.type)}</p>
                 </header>
-                <CardPageButtons />
+                <CardPageButtonsContainer />
               </div>
             </div>
           </div>

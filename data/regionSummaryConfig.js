@@ -22,7 +22,7 @@ export default [
       buttonTitle: 'Gå til befolkninssammensetning'
     },
     chartKind: 'benchmark',
-    compareRegionToSimilar: true,
+    compareWithSimilarRegions: true,
     additionalTitleParams: [],
     relevantFor: ['borough', 'municipality', 'county', 'commerceRegion'],
     title: options => {
@@ -51,7 +51,7 @@ export default [
       buttonTitle: 'Gå til innvandringsårsak'
     },
     chartKind: 'benchmark',
-    compareRegionToSimilar: true,
+    compareWithSimilarRegions: true,
     additionalTitleParams: ['aar'],
     relevantFor: ['borough', 'municipality', 'county', 'commerceRegion'],
     title: options => {
@@ -80,7 +80,7 @@ export default [
       buttonTitle: 'Gå til tilskudd'
     },
     chartKind: 'benchmark',
-    compareRegionToSimilar: true,
+    compareWithSimilarRegions: true,
     additionalTitleParams: ['aar'],
     relevantFor: ['municipality', 'county', 'commerceRegion'],
     title: options => {
@@ -109,7 +109,7 @@ export default [
       buttonTitle: 'Gå til sysselsetting'
     },
     chartKind: 'bar',
-    compareRegionToSimilar: false,
+    compareWithSimilarRegions: false,
     additionalTitleParams: ['innvkat3'],
     relevantFor: ['borough', 'municipality', 'county', 'commerceRegion'],
     title: options => {
@@ -142,7 +142,7 @@ export default [
       buttonTitle: 'Gå til resultater fra introprogrammet'
     },
     chartKind: 'benchmark',
-    compareRegionToSimilar: true,
+    compareWithSimilarRegions: true,
     additionalTitleParams: [],
     relevantFor: ['borough', 'municipality', 'county', 'commerceRegion'],
     title: options => {

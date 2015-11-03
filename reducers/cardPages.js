@@ -1,4 +1,4 @@
-import {RECEIVE_CARD_PAGES} from '../actions/actions'
+import {RECEIVE_CARD_PAGES} from '../actions/ActionTypes'
 
 // "cardPages" consists of config for cards, not actual data to be passed to Card.jsx"
 export default function cardPages(state = [], action) {
