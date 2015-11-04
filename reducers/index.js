@@ -7,6 +7,7 @@ import cardState from './cardState'
 import openCards from './openCards'
 import currentCardsPage from './currentCardsPage'
 import currentCard from './currentCard'
+import breadCrumbs from './breadCrumbs'
 import currentTab from './currentTab'
 import regionSummaries from './regionSummaries'
 
@@ -15,6 +16,7 @@ export default combineReducers({
   allRegions: (state = []) => state,
   allCardsPages: (state = []) => state,
   currentRegion,
+  breadCrumbs,
   headerGroups,
   currentCardsPage,
   currentCard,
