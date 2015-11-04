@@ -1,5 +1,4 @@
 import {NAVIGATE} from '../actions/ActionTypes'
-import capitalize from 'lodash.capitalize'
 
 export default function breadCrumbs(state = [], action) {
   switch (action.type) {
@@ -8,7 +7,7 @@ export default function breadCrumbs(state = [], action) {
       return segments.map((segment, i) => {
         return {
           url: `/${segments.slice(0, i + 1).join('/')}`,
-          title: capitalize(segments[i])
+          title: segments[i]
         }
       })
 
