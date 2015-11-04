@@ -27,7 +27,7 @@ function receiveSummaryData({region, summaryConfig, query, queryResults}) {
     region: region,
     summaryConfig: summaryConfig,
     query: query,
-    queryResult: queryResults
+    queryResult: queryResult
   }
 }
 

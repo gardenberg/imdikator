@@ -8,18 +8,20 @@ import FilterBarContainer from './FilterBarContainer'
 import debug from '../../lib/debug'
 import CardMetadata from '../elements/CardMetadata'
 import {constrainQuery, getQuerySpec} from '../../lib/querySpec'
-import {performQuery} from '../../actions/cardPages'
+import {performQuery} from '../../actions/cardsPage'
 import {queryToOptions, describeChart} from '../../lib/chartDescriber'
 import {isSimilarRegion, getHeaderKey} from '../../lib/regionUtil'
+import {queryResultPresenter} from '../../lib/queryResultPresenter'
+import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
 
 class Card extends Component {
   static propTypes = {
-    card: PropTypes.object,
-    pageName: PropTypes.string,
-    region: PropTypes.object,
+    card: ImdiPropTypes.card.isRequired,
+    region: ImdiPropTypes.region.isRequired,
     query: PropTypes.object,
+    currentTabName: PropTypes.string,
     data: PropTypes.object,
-    headerGroup: PropTypes.object,
+    headerGroups: PropTypes.array,
     table: PropTypes.object,
     activeTab: PropTypes.object,
     boundUpdateCardQuery: PropTypes.func,
@@ -32,11 +34,9 @@ class Card extends Component {
     goTo: PropTypes.func
   }
 
-
   makeLinkToTab(tab) {
-    return this.context.linkTo('/steder/:region/:pageName/:cardName/:tabName', {
+    return this.context.linkTo('/steder/:region/:cardsPageName/:cardName/:tabName', {
       cardName: this.props.card.name,
-      pageName: this.props.pageName,
       tabName: tab.name
     })
   }
@@ -72,6 +72,14 @@ class Card extends Component {
     this.props.dispatch(performQuery(card, activeTab, constrainedQuery.query))
   }
 
+  getHeaderGroupForQuery(query) {
+    const {headerGroups, region} = this.props
+    const regionHeaderKey = getHeaderKey(region)
+    return headerGroups.find(group => {
+      return group.hasOwnProperty(regionHeaderKey) && query.dimensions.every(dim => group.hasOwnProperty(dim.name))
+    })
+  }
+
   getChartKind() {
     const {activeTab} = this.props
     return activeTab.chartKind
@@ -105,7 +113,8 @@ class Card extends Component {
   }
 
   getQuerySpec(query) {
-    const {activeTab, headerGroup, card} = this.props
+    const {activeTab, card} = this.props
+    const headerGroup = this.getHeaderGroupForQuery(query)
     const chart = CHARTS[this.getChartKind()]
     return getQuerySpec(query, {
       tab: activeTab,
@@ -116,13 +125,16 @@ class Card extends Component {
   }
 
   render() {
-    const {card, activeTab, headerGroup, query, region, allRegions} = this.props
+    const {loading, card, data, activeTab, query, region, allRegions} = this.props
 
-    if (!card || !activeTab || !region || !allRegions) {
-      return null
+    if (loading) {
+      return <div>Henter data…</div>
     }
-    const validRegions = this.getValidComparisonRegions()
-    const similarRegions = validRegions.filter(isSimilarRegion(region))
+
+    const headerGroup = this.getHeaderGroupForQuery(query)
+
+    //const validRegions = this.getValidComparisonRegions()
+    //const similarRegions = validRegions.filter(isSimilarRegion(region))
     // if (activeTab.name == 'benchmark') {
     //   similarRegions = allRegions.filter(isSimilarRegion(region))
     // }
@@ -138,7 +150,8 @@ class Card extends Component {
     const ChartComponent = CHARTS[this.getChartKind()].component
     let sortDirection = null
 
-    const chartData = Object.assign({}, this.props.data)
+    debugger
+    const chartData = Object.assign({}, data)
     if (activeTab.name == 'benchmark') {
       sortDirection = 'ascending'
       chartData.highlight = {
@@ -153,15 +166,16 @@ class Card extends Component {
         aria-hidden="false"
         style={{display: 'block'}}
       >
-        <TabBar activeTab={activeTab} disabledTabs={disabledTabs} tabs={TABS} makeLinkToTab={tab => this.makeLinkToTab(tab)}/>
-        <FilterBarContainer
-          query={query}
-          regionGroups={{recommended: recommended, similar: similarRegions, choices: validRegions}}
-          querySpec={this.getQuerySpec(query)}
-          onChange={this.handleFilterChange.bind(this)}
-        />
+        <TabBar activeTab={activeTab.name} disabledTabs={disabledTabs} tabs={TABS}
+                makeLinkToTab={tab => this.makeLinkToTab(tab)}/>
+        {/*<FilterBarContainer
+         query={query}
+         regionGroups={{recommended: recommended, similar: similarRegions, choices: validRegions}}
+         querySpec={this.getQuerySpec(query)}
+         onChange={this.handleFilterChange.bind(this)}
+         />*/}
         <div className="graph">
-          <ChartComponent data={chartData} sortDirection={sortDirection}/>
+          {data && <ChartComponent data={chartData} sortDirection={sortDirection}/>}
         </div>
         <div className="graph__description">
           {graphDescription}
@@ -170,10 +184,10 @@ class Card extends Component {
         </div>
         <div className="graph__functions">
           <button type="button" className="button button--secondary button--small">
-            <i className="icon__export"></i> Lenke til figuren
+            <i className="icon__export"/> Lenke til figuren
           </button>
           <button type="button" className="button button--secondary button--small">
-            <i className="icon__download"></i> Last ned
+            <i className="icon__download"/> Last ned
           </button>
         </div>
         <CardMetadata
@@ -188,28 +202,26 @@ class Card extends Component {
 }
 
 function select(state, ownProps) {
-  const cardState = state.cardState[ownProps.card.name]
 
-  if (!cardState) {
-    return {}
+  const cardState = (state.cardState[ownProps.region.prefixedCode] || {})[ownProps.card.name]
+
+  if (!cardState || cardState.loading) {
+    return {loading: true}
   }
 
-  const {query, activeTab, data} = cardState
+  // Find query from cardState.tabs[activeTab.name]
+  const {activeTab, tabs} = cardState
 
-  const headerGroups = state.headerGroups[query.tableName]
+  const tabState = tabs[activeTab.name]
 
-  const regionHeaderKey = getHeaderKey(state.region)
+  const {query, headerGroups, queryResult} = tabState
 
-  const headerGroup = headerGroups && headerGroups.find(group => {
-    return group.hasOwnProperty(regionHeaderKey) && query.dimensions.every(dim => group.hasOwnProperty(dim.name))
-  })
   return {
-    region: state.region,
-    allRegions: state.allRegions,
-    headerGroup,
-    data,
-    headerGroups,
+    region: state.currentRegion,
     activeTab,
+    allRegions: state.allRegions,
+    data: queryResult && queryResultPresenter(query, queryResult, activeTab),
+    headerGroups,
     query
   }
 }

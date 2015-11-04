@@ -16,12 +16,12 @@ import apiClient from '../../config/apiClient'
 function loadInitialState() {
   // Load resources that is needed throughout the apps life time, e.g. cardPages, all regions
   const gotAllRegions = apiClient.getAllRegions()
-  const gotCardPages = apiClient.getCardPages()
+  const gotCardsPages = apiClient.getCardsPages()
 
-  return Promise.all([gotAllRegions, gotCardPages]).then(([allRegions, cardPages]) => {
+  return Promise.all([gotAllRegions, gotCardsPages]).then(([allRegions, allCardsPages]) => {
     return {
       allRegions,
-      cardPages
+      allCardsPages
     }
   })
 }
@@ -29,7 +29,8 @@ function loadInitialState() {
 async function bootstrap() {
   const store = createImdiAppStore(await loadInitialState())
   const router = Router(compileRoutes(routes), match => {
-    store.dispatch(navigate(match))
+    const Component = match.handler(store.dispatch, match)
+    store.dispatch(navigate(Component, match))
   })
 
   const selector = '[data-imdikator=site]'

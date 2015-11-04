@@ -20,17 +20,18 @@ export function setCurrentRegionByCode(regionCode) {
   return (dispatch, getState) => {
     const {currentRegion, allRegions} = getState()
     if (currentRegion && currentRegion.code == regionCode) {
-      return
+      return currentRegion
     }
 
     const foundRegion = allRegions.find(region => region.prefixedCode.toLowerCase() === regionCode.toLowerCase())
 
     if (!foundRegion) {
       dispatch(regionNotFound(regionCode))
-      return
+      return null
     }
 
     dispatch(setCurrentRegion(foundRegion))
+    return foundRegion
   }
 }
 

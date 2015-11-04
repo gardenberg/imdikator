@@ -7,7 +7,7 @@ import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
 class RegionInfoContainer extends Component {
 
   static propTypes = {
-    region: ImdiPropTypes.region,
+    region: ImdiPropTypes.region.isRequired,
     municipality: ImdiPropTypes.region,
     county: ImdiPropTypes.region,
     commerceRegion: ImdiPropTypes.region
@@ -61,7 +61,7 @@ function mapStateToProps(state, ownProps) {
       county = reg
     }
     // Should stop if we found what we looked for
-    return (!findMunicipalityCode || municipality) || (!findCountyCode || county)
+    return (!findMunicipalityCode || municipality) && (!findCountyCode || county)
   })
 
   // Unfortunately we cannot do this before we already found the municipality

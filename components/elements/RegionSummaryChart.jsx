@@ -77,9 +77,9 @@ export default class RegionSummaryChart extends Component {
       }
     })
 
-    const drillDownUrl = this.context.linkTo('/steder/:region/:pageName/:cardName', {
+    const drillDownUrl = this.context.linkTo('/steder/:region/:cardsPageName/:cardName', {
       region: region.prefixedCode,
-      pageName: config.drillDown.page,
+      cardsPageName: config.drillDown.page,
       cardName: config.drillDown.card
     })
 

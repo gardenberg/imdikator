@@ -54,36 +54,35 @@ const cardData = {
 
 const state = {
   allRegions: [],
-  cardPages: [],
+  allCardsPages: [],
   regionSummaries: {
-    K0301: [
-      {
+    K0301: {
+      '$config.name': {
         config: {/*...*/},
         status: 'loading',
         query: {},
         queryResult: []
       }
-    ]
+    }
   },
   currentRegion: {},
-  regions: {
+  currentCardsPage: {},
+  headerGroups: {
+    $tableName: {
+
+    }
+  },
+  cardState: {
     K0301: {
-      name: 'Oslo',
-      summary: {
-        // ...
-      },
       befolkning_hovedgruppe: {
-        name: '',
-        latest: {
-          name: '<$cardName>',
-          readyState: 'loading', /*|complete|error*/
-          headerGroups: {/* cardData.headerGroups above */}, // <-- never changed
-          config: {/* cardData.config above */}, // <-- never changed
-          isOpen: true,
-          currentTab: {
+        //...
+        currentTab: 'latest',
+        tabs: {
+          latest: {
+            readyState: 'loading', /*|complete|error*/
+            isOpen: true,
             filterState: {/* current tab's filter state and options */},
-            name: 'chronological',
-            data: {/* current data as returned from query */},
+            queryResult: {/* current data as returned from query */},
             query: {
               tableName: 'befolkning_hovedgruppe',
               comparisonRegions: [],
@@ -93,13 +92,11 @@ const state = {
                   name: 'innvkat4',
                   variables: 'all'
                 }
-                /**/
               ]
             }
           }
         }
-      },
-      K0543: {}
+      }
     }
   }
 }

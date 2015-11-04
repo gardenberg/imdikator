@@ -1,9 +1,10 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import Card from '../containers/Card'
-import {loadCardPageData, loadCardPages} from '../../actions/cardPages'
+import {loadCardPageData, loadCardPages} from '../../actions/cardsPage'
 import {openCard} from '../../actions/cards'
 import {_t} from '../../lib/translate'
+import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
 
 const cardsConfig = {}
 
@@ -20,7 +21,7 @@ function loadData(props) {
       page.cards.forEach(card => {
         cardsConfig[card.name] = card
         dispatch(loadCardPageData({
-          pageName: page.name,
+          cardsPageName: page.name,
           activeCardName: card.name,
           regionCode: prefixedRegionCode,
           activeTabName: 'latest'
@@ -97,7 +98,7 @@ class FactsPage extends Component {
                                 <h3 className="toggle-list__button-title">{card.title}
                                   <i className="icon__arrow-down toggle-list__button-icon"/>
                                 </h3>
-                                <Card card={card} pageName={cardPageConfig.name}/>
+                                <Card card={card} cardsPageName={cardPageConfig.name}/>
                               </section>
                             </li>
                           )

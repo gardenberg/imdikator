@@ -1,14 +1,13 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {loadCardPages} from '../../actions/cardPages'
 import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
 
 class CardPageButtons extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func,
-    currentCardPage: ImdiPropTypes.cardPage,
-    cardPages: PropTypes.arrayOf(ImdiPropTypes.cardPage),
+    currentCardsPage: ImdiPropTypes.cardsPage,
+    allCardsPages: PropTypes.arrayOf(ImdiPropTypes.cardsPage),
     currentRegion: ImdiPropTypes.region
   }
 
@@ -17,27 +16,29 @@ class CardPageButtons extends Component {
   }
 
   render() {
-    const {cardPages, currentCardPage, currentRegion} = this.props
+    const {allCardsPages, currentCardsPage, currentRegion} = this.props
+
     const {linkTo} = this.context
-    if (!cardPages || !currentRegion) {
-      return <div>Henter data...</div>
+
+    if (!allCardsPages || !currentRegion) {
+      return null
     }
 
     const summaryPage = {
       name: 'summary',
       title: 'Oppsummert',
-      selected: !currentCardPage,
+      selected: !currentCardsPage,
       url: linkTo('/steder/:region')
     }
 
-    const otherPages = cardPages.map(cardPage => {
-      const firstCard = cardPage.cards[0]
+    const otherPages = allCardsPages.map(cardsPage => {
+      const firstCard = cardsPage.cards[0]
       return {
-        name: cardPage.name,
-        title: cardPage.title,
-        selected: cardPage == currentCardPage,
-        url: linkTo('/steder/:region/:pageName/:cardName', {
-          pageName: cardPage.name,
+        name: cardsPage.name,
+        title: cardsPage.title,
+        selected: cardsPage == currentCardsPage,
+        url: linkTo('/steder/:region/:cardsPageName/:cardName', {
+          cardsPageName: cardsPage.name,
           cardName: firstCard.name
         })
       }
@@ -70,8 +71,8 @@ class CardPageButtons extends Component {
 
 function mapStateToProps(state) {
   return {
-    pageConfig: state.cardPageData,
-    cardPages: state.cardPages,
+    allCardsPages: state.allCardsPages,
+    currentCardsPage: state.currentCardsPage,
     currentRegion: state.currentRegion
   }
 }

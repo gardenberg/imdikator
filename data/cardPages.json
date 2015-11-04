@@ -29,7 +29,7 @@
             }
           ]
         },
-        "tabs": [
+        "tab": [
           {
             "name": "chronological",
             "chartKind": "stackedArea"

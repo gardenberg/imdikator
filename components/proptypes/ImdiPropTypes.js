@@ -10,9 +10,6 @@ export const regionPickerGroup = PropTypes.shape({
   items: PropTypes.arrayOf(region)
 })
 
-export const cardPage = PropTypes.shape({
-  name: PropTypes.string
-})
 
 export const route = PropTypes.shape({
   params: PropTypes.object,
@@ -27,6 +24,15 @@ export const route = PropTypes.shape({
 export const router = PropTypes.shape({
   navigate: PropTypes.func,
   makeLink: PropTypes.func
+})
+
+export const card = PropTypes.shape({
+  name: PropTypes.string
+})
+
+export const cardsPage = PropTypes.shape({
+  name: PropTypes.string,
+  title: PropTypes.string
 })
 
 export const chartData = PropTypes.shape({

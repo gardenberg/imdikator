@@ -1,11 +1,11 @@
-import {OPEN_CARD, CLOSE_CARD} from '../actions/ActionTypes'
+import {SET_CURRENT_CARD, CLOSE_CARD} from '../actions/ActionTypes'
 
 export default function cards(state = [], action) {
   switch (action.type) {
-    case OPEN_CARD:
-      return state.filter(cardName => cardName !== action.cardName).concat(action.cardName)
+    case SET_CURRENT_CARD:
+      return state.filter(cardName => cardName !== action.card.name).concat(action.card.name)
     case CLOSE_CARD:
-      return state.filter(cardName => cardName !== action.cardName)
+      return state.filter(cardName => cardName !== action.card.name)
     default:
       return state
   }

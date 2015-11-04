@@ -8,10 +8,9 @@ class RegionSearchContainer extends Component {
 
   static propTypes = {
     dispatch: PropTypes.func,
-    allRegions: PropTypes.arrayOf(RegionPropType),
+    allRegions: PropTypes.arrayOf(ImdiPropTypes.region),
     onSelect: PropTypes.func,
-    placeholder: PropTypes.string,
-    loading: PropTypes.bool
+    placeholder: PropTypes.string
   }
 
   static defaultProps = {
@@ -19,10 +18,7 @@ class RegionSearchContainer extends Component {
   }
 
   render() {
-    const {allRegions, placeholder, onSelect, loading} = this.props
-    if (loading) {
-      return null
-    }
+    const {allRegions, placeholder, onSelect} = this.props
     return (
       <RegionSearch
         regions={allRegions}
@@ -35,7 +31,6 @@ class RegionSearchContainer extends Component {
 
 function mapStateToProps(state) {
   return {
-    loading: state.allRegions.length === 0,
     allRegions: state.allRegions
   }
 }

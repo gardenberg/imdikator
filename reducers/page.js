@@ -4,7 +4,7 @@ import capitalize from 'lodash.capitalize'
 export default function allRegions(state = null, action) {
   switch (action.type) {
     case NAVIGATE:
-      return action.match.handler
+      return action.PageComponent
     default:
       return state
   }

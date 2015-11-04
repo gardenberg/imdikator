@@ -1,20 +1,25 @@
 import {combineReducers} from 'redux'
 import route from './route'
-import allRegions from './allRegions'
 import currentRegion from './currentRegion'
 import page from './page'
 import headerGroups from './headerGroups'
 import cardState from './cardState'
 import openCards from './openCards'
-import cardPageData from './cardPageData'
-import cardPagesData from './cardPagesData'
-import cardPages from './cardPages'
+import currentCardsPage from './currentCardsPage'
+import currentCard from './currentCard'
+import currentTab from './currentTab'
 import regionSummaries from './regionSummaries'
 
 export default combineReducers({
   page: page,
-  allRegions,
+  allRegions: (state = []) => state,
+  allCardsPages: (state = []) => state,
   currentRegion,
-  cardPages,
+  headerGroups,
+  currentCardsPage,
+  currentCard,
+  currentTab,
+  openCards,
+  cardState,
   regionSummaries
 })
