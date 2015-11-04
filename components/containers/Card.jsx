@@ -150,7 +150,6 @@ class Card extends Component {
     const ChartComponent = CHARTS[this.getChartKind()].component
     let sortDirection = null
 
-    debugger
     const chartData = Object.assign({}, data)
     if (activeTab.name == 'benchmark') {
       sortDirection = 'ascending'
