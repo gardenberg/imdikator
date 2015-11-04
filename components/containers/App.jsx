@@ -46,13 +46,13 @@ class App extends Component {
             <span className="breadcrumbs__divider">/</span>
           </li>
           {breadCrumbs.map(crumb => (
-          <li key={crumb.url} className="breadcrumbs__list-item">
-            <a href={crumb.url} className="breadcrumbs__link">
-              {crumb.title}
-            </a>
-            <span className="breadcrumbs__divider">/</span>
-          </li>
-            ))}
+            <li key={crumb.url} className="breadcrumbs__list-item">
+              <a href={crumb.url} className="breadcrumbs__link">
+                {crumb.title}
+              </a>
+              <span className="breadcrumbs__divider">/</span>
+            </li>
+          ))}
         </ul>
       </nav>
     )
