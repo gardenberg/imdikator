@@ -8,13 +8,14 @@ export default class RegionQuickSwitch extends Component {
   }
 
   handleSelectRegion(region) {
-    this.context.goTo('/steder/:region', {region: prefixifyRegion(region)})
+    this.context.goTo('/indikator/steder/:region', {region: prefixifyRegion(region)})
   }
 
   render() {
     return (
-      <div>
-        <label><span className="label h3 t-margin-top--large">Gå til sted</span>
+      <div className="t-hide-on-print">
+        <label>
+          <span className="label h3 t-margin-top--large">Gå til sted</span>
           <div className="search search--autocomplete">
               <RegionSearch onSelect={this.handleSelectRegion.bind(this)} placeholder="Kommune/bydel/fylke/næringsregion"/>
           </div>

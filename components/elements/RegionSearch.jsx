@@ -5,6 +5,9 @@ import cx from 'classnames'
 import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
 
 function shouldItemRender(region, value) {
+  if (region.prefixedCode == 'F00') {
+    return false
+  }
   return region.name.toLowerCase().includes(value.toLowerCase())
 }
 
@@ -24,12 +27,8 @@ export default class RegionSearch extends Component {
   }
 
   static defaultProps = {
-    onSelect() {}
-  }
-
-  constructor() {
-    super()
-    this.state = {didForceOpen: false}
+    onSelect() {
+    }
   }
 
   handleSelectRegion(region) {
@@ -47,10 +46,10 @@ export default class RegionSearch extends Component {
         <a
           key={item.name + item.type}
           className={classes}
-          role={'option'}
+          role="option"
         >
         {itemDescription}
-        <i className="icon__arrow-right icon--red search-result__icon"></i>
+        <i className="icon__arrow-right icon--red search-result__icon"/>
         </a>
       </li>
     )
@@ -59,7 +58,13 @@ export default class RegionSearch extends Component {
   renderMenu(items, value, style) {
 
     if (items.length === 0) {
-      return wrap(<li><div className="search-result__result search-result__result--message" role={'option'}>Ingen treff - prøv et annet stedsnavn i Norge</div></li>)
+      return wrap(
+        <li>
+          <div className="search-result__result search-result__result--message" role="option">
+            Ingen treff - prøv et annet stedsnavn i Norge
+          </div>
+        </li>
+      )
     }
 
     const displayItems = 15 + Math.pow(value.length, 4)
@@ -73,15 +78,12 @@ export default class RegionSearch extends Component {
 
   render() {
     const {regions, placeholder} = this.props
-
     return (
       <Autocomplete
         items={regions}
         getItemValue={item => item.name}
         openOnFocus={false}
         shouldItemRender={shouldItemRender}
-        onForceOpen={() => this.setState({forceOpen: true})}
-        onClose={() => this.setState({forceOpen: false})}
         onSelect={(value, item) => this.handleSelectRegion(item)}
         sortItems={sortRegions}
         inputProps={{placeholder: placeholder}}

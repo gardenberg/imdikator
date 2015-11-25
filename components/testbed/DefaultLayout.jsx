@@ -1,10 +1,15 @@
-import React from 'react'
+import React, {Component, PropTypes} from 'react'
 
 /**
  * Only for development
  */
-export default class DefaultLayout extends React.Component {
+export default class DefaultLayout extends Component {
+  static propTypes = {
+    children: PropTypes.node,
+    extraHead: PropTypes.node
+  }
   render() {
+    const {children, extraHead} = this.props
     return (
       <html>
       <head>
@@ -14,6 +19,7 @@ export default class DefaultLayout extends React.Component {
         <title>IMDI Testbed</title>
         <link rel="stylesheet" href="/build/stylesheets/main.css"/>
         <link rel="icon" type="image/x-icon" href="/_themes/design/img/favicon.ico"/>
+        {extraHead}
       </head>
       <body>
         <svg height="0" width="0" className="t-only-screenreaders">
@@ -62,36 +68,14 @@ export default class DefaultLayout extends React.Component {
                     <span className="ident__textmark-secondary">Integrerings- og <br />mangfoldsdirektoratet</span>
                   </span>
                 </a>
-                <a href="#footer" data-behaviour="main-menu-toggle" className="button header__button header__button--menu"
-                  aria-expanded="false"><span className="header__button-text--open">Meny</span>
-                  <span className="header__button-text--close">Lukk</span>
-                  <i className="header__menu-icon">
-                    <span className="header__menu-icon-bar"/>
-                    <span className="header__menu-icon-bar"/>
-                    <span className="header__menu-icon-bar"/>
-                  </i>
-                </a>
-                <a href="#footer-search" data-behaviour="main-search-toggle"
-                  className="button header__button header__button--search" aria-expanded="false">
-                  <span className="header__button-text">Søk</span> <i className="icon__search header__search-icon"/>
-                </a>
-                <div className="header__search">
-                  <div className="search search--header">
-                    <form action="/sok" method="get" role="search">
-                      <label htmlFor="header-search" className="t-only-screenreaders">Søk nettstedet</label>
-                      <input className="input search__input" type="text" name="query" defaultValue
-                        placeholder="Søk nettstedet"/>
-                      <button type="submit" className="button search__button">Søk <i
-                        className="icon__search search__button-icon"/></button>
-                    </form>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </header>
         <div className="page__master">
-          <div data-imdikator="site"/>
+          <div className="page">
+            {children}
+          </div>
         </div>
         <footer className="footer" tabIndex={-1} data-toggle-menu="footer--overlay">
           <div className="wrapper">
@@ -132,7 +116,7 @@ export default class DefaultLayout extends React.Component {
                           <label htmlFor="footer-search" className="t-only-screenreaders">Søk nettstedet</label>
 
                           <div className="search search--footer">
-                            <input className="input search__input" type="text" name="query" defaultValue placeholder="Søk nettstedet"/>
+                            <input className="input search__input" type="text" name="query" placeholder="Søk nettstedet"/>
                             <button type="submit" className="button search__button"><i
                               className="icon__search icon--white"/><span className="t-only-screenreaders">Søk</span>
                             </button>
@@ -174,7 +158,6 @@ export default class DefaultLayout extends React.Component {
             </div>
           </div>
         </footer>
-        <script src="/build/js/bundles/main.js" async defer/>
       </body>
       </html>
     )

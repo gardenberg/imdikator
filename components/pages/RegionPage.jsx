@@ -25,7 +25,7 @@ class RegionPage extends Component {
   }
 
   handleSelectRegion(region) {
-    this.context.goTo('/steder/:region', {region: region.prefixedCode})
+    this.context.goTo('/indikator/steder/:region', {region: region.prefixedCode})
   }
 
   render() {
@@ -35,7 +35,7 @@ class RegionPage extends Component {
       return null
     }
 
-    const factSheetLink = this.context.linkTo('/steder/:region/fakta', {region: currentRegion.prefixedCode})
+    const factSheetLink = this.context.linkTo('/indikator/steder/:region/fakta', {region: currentRegion.prefixedCode})
 
     return (
       <main className="page">
@@ -46,7 +46,7 @@ class RegionPage extends Component {
                 <header>
                   <h1>{getPageTitle(currentRegion)}</h1>
                   <p className="ingress">{getPageIngress(currentRegion)}</p>
-                  <div className="t-margin-bottom--large">
+                  <div className="t-margin-bottom--large t-hide-on-print">
                     <label><span className="label">Gå til sted</span>
                       <div className="search search--autocomplete">
                           <RegionSearch onSelect={this.handleSelectRegion.bind(this)} placeholder="Kommune/bydel/fylke/næringsregion" />
@@ -70,7 +70,7 @@ class RegionPage extends Component {
                   </div>
                 </div>
 
-                <section className="feature">
+                <section className="feature t-hide-on-print">
                   <h2 className="feature__title">Faktaark</h2>
                   <p>
                     Et dokument hvor alle nøkkeltallene fra {currentRegion.name} {_t(currentRegion.type)} er gjengitt.
@@ -100,7 +100,7 @@ class RegionPage extends Component {
             </div>
           </div>
         </div>
-        <div className="page__footer">
+        <div className="page__footer t-hide-on-print">
           <div className="wrapper">
             <div className="row">
               <div className="col--main">

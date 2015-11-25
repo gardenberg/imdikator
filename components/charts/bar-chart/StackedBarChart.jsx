@@ -82,10 +82,10 @@ export default class StackedBarChart extends Component {
       xScales[cat.title] = scale
     })
 
-    const category = svg.selectAll('.category')
+    const category = svg.selectAll('.chart__category')
     .data(data.preparedData)
     .enter().append('g')
-    .attr('class', 'category')
+    .attr('class', 'chart__category')
     .attr('transform', cat => this.translation(x0(cat.title), 0))
 
     let hoveropen = false
@@ -106,6 +106,7 @@ export default class StackedBarChart extends Component {
     .enter()
     .append('svg:a')
     .attr('xlink:href', 'javascript://') // eslint-disable-line no-script-url
+    .attr('aria-label', item => item.title + ' ' + item.formattedValue) // For screenreaders
     .on('click', () => d3.event.stopPropagation())
     .on('focus', item => open(item))
     .append('rect')
@@ -131,7 +132,7 @@ export default class StackedBarChart extends Component {
     // Add X axis
     /* eslint-disable prefer-reflect */
     const xAxisEl = this.svg.append('g')
-    .attr('class', 'axis')
+    .attr('class', 'chart__axis')
     .attr('transform', this.translation(0, this.size.height))
     .call(xAxis)
 
@@ -149,7 +150,7 @@ export default class StackedBarChart extends Component {
 
     /* eslint-disable prefer-reflect */
     const legendWrapper = this._svg.append('g')
-    .attr('class', 'legendWrapper')
+    .attr('class', 'chart__legend-wrapper')
     .attr('width', this.fullWidth)
     // Place it at the very bottom
     .datum(seriesNames.values())
@@ -162,7 +163,11 @@ export default class StackedBarChart extends Component {
     legendWrapper.attr('transform', () => this.translation(0, legendBottom))
 
     // Expand the height to fit the legend
-    this._svg.attr('height', this.fullHeight + xAxisHeight + leg.height())
+    const expandedHeight = this.fullHeight + xAxisHeight + leg.height()
+    this._svg
+    .attr('height', expandedHeight)
+    .attr('viewBox', '0 0 ' + this.fullWidth + ' ' + expandedHeight)
+
   }
 
   render() {

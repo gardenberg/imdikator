@@ -223,12 +223,12 @@ describe('chartDescriber', () => {
       timePeriod: ['2013'],
       regions: ['Sandefjord', 'Drøbak', 'Larvik', 'Bø i Telemark']
     }
-    let expected = 'Figuren viser flyktninger i 2013 fra Sandefjord, Drøbak, Larvik og Bø i Telemark.'
+    let expected = 'Figuren viser flyktninger i 2013 i Sandefjord, Drøbak, Larvik og Bø i Telemark.'
     assert.equal(describeChart(opts), expected)
 
     opts.regions = ['Sandefjord']
     opts.comparisonType = 'kommuner'
-    expected = 'Figuren viser flyktninger i 2013 fra Sandefjord.'
+    expected = 'Figuren viser flyktninger i 2013 i Sandefjord.'
     assert.equal(describeChart(opts), expected)
   })
 
@@ -243,7 +243,7 @@ describe('chartDescriber', () => {
     }
     const expected = 'Figuren viser flyktninger med aldersfordeling avgrenset til 0-3 år, kjønnsfordeling avgrenset til'
       + ' kvinner og bakgrunn avgrenset til innvandrere fordelt etter flyktninger og befolkningsgrupper i perioden 2012 til'
-      + ' 2014 fra Sandefjord, Drøbak, Larvik og Bø i Telemark.'
+      + ' 2014 i Sandefjord, Drøbak, Larvik og Bø i Telemark.'
     assert.equal(describeChart(opts), expected)
   })
 

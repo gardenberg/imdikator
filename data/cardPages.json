@@ -2,7 +2,6 @@
   {
     "name": "befolkning",
     "title": "Befolkning og bosetting",
-    "groupKind": "mainGroup",
     "cards": [
       {
         "name": "befolkning_hovedgruppe",
@@ -54,6 +53,17 @@
                 "innvandrere",
                 "befolkningen_ellers"
               ]
+            },
+            "alderGrupper": {
+              "include": [
+                "0_5",
+                "16_19",
+                "20_29",
+                "30_54",
+                "55_66",
+                "6_15",
+                "67+"
+              ]
             }
           }
         },
@@ -84,21 +94,7 @@
             "name": "latest",
             "chartKind": "pyramid"
           }
-        ],
-        "dimensionsConfig": {
-          "innvkat3": {
-            "include": [
-              "innvandrere",
-              "befolkningen_ellers"
-            ]
-          },
-          "kjonn": {
-            "hidden": true
-          },
-          "alderGrupper": {
-            "hidden": true
-          }
-        }
+        ]
       },
       {
         "name": "befolkning_innvandringsgrunn",
@@ -459,8 +455,7 @@
             }
           ]
         },
-        "tabs": [],
-        "issue": "should be line chart – and area chart"
+        "tabs": []
       },
       {
         "name": "flyktninger_befolkningsandel",
@@ -484,7 +479,6 @@
   {
     "name": "utdanning",
     "title": "Skole og utdanning",
-    "groupKind": "mainGroup",
     "cards": [
       {
         "name": "utdanningsniva-grunnskole",
@@ -536,6 +530,7 @@
           "dimensions": {
             "utd4": {
               "hidden": true,
+              "excludeFromChart": true,
               "include": [
                 "vgs"
               ]
@@ -555,12 +550,10 @@
           ],
           "dimensions": [
             {
-              "name": "utd4",
-              "variables": "all"
+              "name": "utd4"
             },
             {
-              "name": "innvkat3",
-              "variables": "all"
+              "name": "innvkat3"
             },
             {
               "name": "kjonn",
@@ -580,6 +573,7 @@
           "dimensions": {
             "utd4": {
               "hidden": true,
+              "excludeFromChart": true,
               "include": [
                 "universitet_og_hogskole"
               ]
@@ -625,6 +619,7 @@
           "dimensions": {
             "utd4": {
               "hidden": true,
+              "excludeFromChart": true,
               "include": [
                 "uoppgitt_ingen"
               ]
@@ -700,10 +695,6 @@
           ]
         },
         "tabs": [
-          {
-            "name": "latest",
-            "chartKind": "stackedBar"
-          }
         ]
       },
       {
@@ -745,10 +736,6 @@
           ]
         },
         "tabs": [
-          {
-            "name": "latest",
-            "chartKind": "stackedBar"
-          }
         ]
       },
       {
@@ -897,7 +884,6 @@
   {
     "name": "kvalifisering",
     "title": "Kvalifisering og intro",
-    "groupKind": "mainGroup",
     "cards": [
       {
         "name": "deltagere-introprogram",
@@ -1137,7 +1123,6 @@
   {
     "name": "arbeid",
     "title": "Arbeid og levekår",
-    "groupKind": "mainGroup",
     "cards": [
       {
         "name": "sysselsatte-innvkat",
@@ -1583,7 +1568,6 @@
   {
     "name": "tilskudd",
     "title": "Tilskudd",
-    "groupKind": "mainGroup",
     "cards": [
       {
         "name": "tilskudd",

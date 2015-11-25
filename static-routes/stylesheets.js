@@ -1,7 +1,9 @@
 import less from 'less'
 import path from 'path'
+import fs from 'fs'
 import config from '../config'
 import readdir from 'fs-readdir-recursive'
+import CombinedStream from 'combined-stream'
 
 const imdiStylesRoot = path.dirname(require.resolve('imdi-styles'))
 
@@ -45,5 +47,11 @@ export default {
         })
       })
       .then(output => output.css)
+  },
+  '/build/stylesheets/codemirror.css'() {
+    const combinedStream = CombinedStream.create()
+    combinedStream.append(fs.createReadStream(require.resolve('codemirror/lib/codemirror.css')))
+    combinedStream.append(fs.createReadStream(require.resolve('codemirror/theme/solarized.css')))
+    return combinedStream
   }
 }

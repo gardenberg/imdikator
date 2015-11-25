@@ -2,6 +2,8 @@ import React, {Component, PropTypes} from 'react'
 import {findDOMNode} from 'react-dom'
 import scrollIntoView from 'dom-scroll-into-view'
 
+const DISABLE_AUTO_COMPLETE_INPUT_TEXT = true
+
 /**
  * Based on https://github.com/rackt/react-autocomplete
  * but sadly included here to get more control of styling and custom behavior
@@ -18,6 +20,7 @@ export default class Autocomplete extends Component {
     openOnFocus: PropTypes.bool,
     renderItem: PropTypes.func.isRequired,
     sortItems: PropTypes.func,
+    focusAfterSelect: PropTypes.bool,
     menuStyle: PropTypes.object,
     inputProps: PropTypes.object,
     getItemValue: PropTypes.func,
@@ -201,9 +204,11 @@ export default class Autocomplete extends Component {
   }
 
   maybeAutoCompleteText() {
-    if (this.state.value === '') {
+
+    if (DISABLE_AUTO_COMPLETE_INPUT_TEXT || this.state.value === '') {
       return
     }
+
     const {highlightedIndex} = this.state
     const items = this.getFilteredItems()
     if (items.length === 0) {
@@ -256,7 +261,9 @@ export default class Autocomplete extends Component {
       highlightedIndex: null
     }, () => {
       this.selectItem(value, item)
-      findDOMNode(this.refs.input).focus()
+      if (this.props.focusAfterSelect) {
+        findDOMNode(this.refs.input).focus()
+      }
       this.setIgnoreBlur(false)
     })
   }
@@ -273,6 +280,7 @@ export default class Autocomplete extends Component {
         {cursor: 'default'}
       )
       return React.cloneElement(element, {
+        key: item.prefixedCode,
         onMouseDown: () => this.setIgnoreBlur(true),
         onMouseEnter: () => this.highlightItemFromMouse(index),
         onClick: () => this.selectItemFromMouse(item),
@@ -285,7 +293,12 @@ export default class Autocomplete extends Component {
       minWidth: this.state.menuWidth,
     }
     const menu = this.props.renderMenu(items, this.state.value, style)
-    return React.cloneElement(menu, {ref: 'menu'})
+    return React.cloneElement(menu, {
+      ref: 'menu',
+      onClick(e) {
+        e.preventDefault()
+      }
+    })
   }
 
   handleInputBlur() {

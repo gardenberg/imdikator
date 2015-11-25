@@ -109,12 +109,12 @@ export default class LineChart extends React.Component {
     .y(dataItem => dataItem.y)
     .defined(dataItem => !isNaN(dataItem.value))
 
-    const ss = this.svg.selectAll('g.line-serie')
+    const ss = this.svg.selectAll('g.chart__line-serie')
     .data(data.preparedData)
     .enter()
     .append('g')
     .attr('id', dataItem => dataItem.key)
-    .attr('class', 'line-serie')
+    .attr('class', 'chart__line-serie')
 
     ss.selectAll('path')
     .data(dataItem => [dataItem])
@@ -123,17 +123,17 @@ export default class LineChart extends React.Component {
     .attr('d', dataItem => line(dataItem.values))
     .attr('fill', 'none')
     .attr('stroke', dataItem => dataItem.color)
-    .attr('class', 'graph__path')
+    .attr('class', 'chart__path')
 
-    const sc = this.svg.selectAll('g.line-dot')
+    const sc = this.svg.selectAll('g.chart__line-dot')
     .data(data.preparedData)
     .enter()
     .append('g')
-    .attr('class', 'line-dot')
+    .attr('class', 'chart__line-dot')
 
     const focus = svg.append('g')
     .attr('transform', 'translate(-100,-100)')
-    .attr('class', 'focus')
+    .attr('class', 'chart__line-dot-focus')
     focus.append('circle')
     .attr('r', 4)
 
@@ -161,6 +161,7 @@ export default class LineChart extends React.Component {
     .enter()
     .append('svg:a')
     .attr('xlink:href', 'javascript://') // eslint-disable-line no-script-url
+    .attr('aria-label', item => 'År: ' + item.title + ', Verdi: ' + item.formattedValue) // For screenreaders
     .on('click', () => d3.event.stopPropagation())
     .on('focus', item => open(item))
     .append('circle')
@@ -206,7 +207,7 @@ export default class LineChart extends React.Component {
     .clipExtent([[0, 0], [this.size.width, this.size.height]])
 
     const voronoiGroup = svg.append('g')
-    .attr('class', 'voronoi')
+    .attr('class', 'chart__voronoi')
 
     // Filter out any undefined points on the lines
     const voronoiPoints = data.preparedData.map(item => {
@@ -239,7 +240,7 @@ export default class LineChart extends React.Component {
 
     /* eslint-disable prefer-reflect */
     const xAxisEl = svg.append('g')
-    .attr('class', 'axis')
+    .attr('class', 'chart__axis')
     .attr('transform', this.translation(0, this.size.height))
     .call(xAxis)
     /* eslint-enable prefer-reflect */
@@ -252,7 +253,7 @@ export default class LineChart extends React.Component {
     const legendBottom = this.fullHeight + xAxisMargin
     /* eslint-disable prefer-reflect */
     this._svg.append('g')
-    .attr('class', 'legendWrapper')
+    .attr('class', 'chart__legend-wrapper')
     .attr('width', this.fullWidth)
     // Place it at the very bottom
     .attr('transform', () => this.translation(0, legendBottom))
@@ -260,9 +261,11 @@ export default class LineChart extends React.Component {
     .call(leg)
     /* eslint-enable prefer-reflect */
 
-    // Increase our height to fit the legend
-    this._svg.attr('height', this.fullHeight + xAxisMargin + leg.height())
-
+    // Expand the height to fit the legend
+    const expandedHeight = this.fullHeight + xAxisMargin + leg.height()
+    this._svg
+    .attr('height', expandedHeight)
+    .attr('viewBox', '0 0 ' + this.fullWidth + ' ' + expandedHeight)
 
   }
 

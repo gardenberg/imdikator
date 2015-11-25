@@ -85,10 +85,10 @@ export default class BubbleChart extends React.Component {
 
     const nodes = bubble.nodes({fill: 'white', children: preparedData}).filter(item => !item.children)
 
-    const node = this.svg.selectAll('.node')
+    const node = this.svg.selectAll('.chart__node')
     .data(nodes)
     .enter().append('g')
-    .attr('class', 'node')
+    .attr('class', 'chart__node')
     .attr('transform', item => this.translation(item.x, item.y))
 
     let hoveropen = false
@@ -117,6 +117,7 @@ export default class BubbleChart extends React.Component {
     node
     .append('svg:a')
     .attr('xlink:href', 'javascript://') // eslint-disable-line no-script-url
+    .attr('aria-label', item => item.title + ' ' + item.formattedValue) // For screenreaders
     .on('click', () => d3.event.stopPropagation())
     .on('focus', item => open(item))
     .append('circle')
@@ -161,7 +162,7 @@ export default class BubbleChart extends React.Component {
     // Add some space between the x axis labels and the legends
     /* eslint-disable prefer-reflect */
     const legendWrapper = this.svg.append('g')
-    .attr('class', 'legendWrapper')
+    .attr('class', 'chart__legend-wrapper')
     .attr('width', this.size.width)
     // Place it at the very bottom
     .datum(regions.values())
@@ -171,7 +172,10 @@ export default class BubbleChart extends React.Component {
     legendWrapper.attr('transform', () => this.translation(0, this.size.height))
 
     // Expand the height to fit the legend
-    this._svg.attr('height', this.fullHeight + leg.height())
+    const expandedHeight = this.fullHeight + leg.height()
+    this._svg
+    .attr('height', expandedHeight)
+    .attr('viewBox', '0 0 ' + this.fullWidth + ' ' + expandedHeight)
   }
 
   render() {

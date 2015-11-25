@@ -7,14 +7,12 @@ import FilterBarContainer from './FilterBarContainer'
 import CardMetadata from '../elements/CardMetadata'
 import ChartDescriptionContainer from './ChartDescriptionContainer'
 import ShareWidget from './ShareWidget'
+import ChartViewModeSelect from '../elements/ChartViewModeSelect'
 import DownloadWidget from './DownloadWidget'
 import {findHeaderGroupForQuery} from '../../lib/queryUtil'
+import UrlQuery from '../../lib/UrlQuery'
 import {queryResultPresenter} from '../../lib/queryResultPresenter'
 import * as ImdiPropTypes from '../proptypes/ImdiPropTypes'
-import Clipboard from 'clipboard'
-import config from '../../config'
-import {performQuery} from '../../actions/cardsPage'
-
 
 class Card extends Component {
   static propTypes = {
@@ -23,9 +21,9 @@ class Card extends Component {
     card: ImdiPropTypes.card.isRequired,
     region: ImdiPropTypes.region.isRequired,
     query: PropTypes.object,
+    queryResult: PropTypes.array,
     cardsPage: PropTypes.object,
     currentTabName: PropTypes.string,
-    data: PropTypes.object,
     headerGroups: PropTypes.array,
     table: PropTypes.object,
     cardsPageName: PropTypes.string.isRequired,
@@ -35,21 +33,23 @@ class Card extends Component {
 
   static contextTypes = {
     linkTo: PropTypes.func,
-    goTo: PropTypes.func
+    goTo: PropTypes.func,
+    navigate: PropTypes.func
   }
 
   constructor(props) {
     super()
     this.state = {
-      showTable: false
+      chartViewMode: 'chart'
     }
   }
 
-  makeLinkToTab(tab) {
-    return this.context.linkTo('/steder/:region/:cardsPageName/:cardName/:tabName', {
+
+  getUrlToTab(tab) {
+    return this.context.linkTo('/indikator/steder/:region/:cardsPageName/:cardName/:tabName', {
       cardName: this.props.card.name,
       cardsPageName: this.props.cardsPageName,
-      tabName: tab.name
+      tabName: tab.urlName
     })
   }
 
@@ -59,88 +59,78 @@ class Card extends Component {
   }
 
   handleFilterChange(newQuery) {
-    const {region, cardsPage, card, activeTab, dispatch} = this.props
-    dispatch(performQuery({region, cardsPage: cardsPage, card: card, tab: activeTab, query: newQuery}))
-  }
-
-
-  handleTableToggle(event) {
-    event.preventDefault()
-    this.setState({showTable: !this.state.showTable})
+    return this.context.navigate(this.getUrlForQuery(newQuery), {replace: true, keepScrollPosition: true})
   }
 
   getChartKind() {
     const {activeTab} = this.props
-    return activeTab.chartKind
+    const {chartViewMode} = this.state
+    return chartViewMode === 'table' ? 'table' : activeTab.chartKind
   }
 
-  chartUrl() {
-    const route = '/steder/:region/:cardsPageName/:cardName/:tabName'
-    const routeOpts = {
-      cardName: this.props.card.name,
-      tabName: this.props.activeTab.name,
-      cardsPageName: this.props.cardsPageName
+  getUrlForQuery(query) {
+    const {card, region, cardsPageName, activeTab} = this.props
+
+    const params = {
+      region: region.prefixedCode,
+      cardName: card.name,
+      cardsPageName: cardsPageName,
+      tabName: activeTab.urlName,
+      query: `@${UrlQuery.stringify(query)}`
     }
-    const host = window.location.hostname
-    const port = `:${window.location.port}`
-    const path = this.context.linkTo(route, routeOpts)
-    return `${host}${config.env == 'development' ? port : ''}${path}`
+    return this.context.linkTo('/indikator/steder/:region/:cardsPageName/:cardName/:tabName/:query', params)
   }
 
-
-  tableFriendlyData(data, query, tabName) {
-    let tableData = Object.assign({}, data)
-    if (tableData.dimensions && !tableData.dimensions.includes('region')) {
-      const dimensions = tableData.dimensions.slice()
-      dimensions.unshift('region')
-      dimensions.push('enhet')
-      tableData = Object.assign({}, tableData, {dimensions: dimensions})
-    }
-    if (tabName == 'benchmark') {
-      const dimensions = query.dimensions.slice().map(dim => dim.name)
-      dimensions.unshift('region')
-      dimensions.push('enhet')
-      tableData = Object.assign({}, tableData, {dimensions: dimensions})
-    }
-    return tableData
+  getShareUrl() {
+    const {query} = this.props
+    const protocol = window.location.protocol
+    const host = window.location.host
+    const path = this.getUrlForQuery(query)
+    return `${protocol}//${host}${path}`
   }
-
 
   render() {
-    const {loading, card, data, activeTab, query, region, headerGroups, printable} = this.props
+    const {loading, card, activeTab, query, queryResult, region, headerGroups, printable} = this.props
+    const {chartViewMode} = this.state
 
     if (!activeTab) {
-      return <div className="toggle-list__section toggle-list__section--expanded"><i className="loading-indicator"/> Laster…</div>
+      return (
+        <div className="toggle-list__section toggle-list__section--expanded"><i className="loading-indicator"/>
+          Laster…
+        </div>
+      )
     }
-    const showTable = this.state.showTable
+
     const headerGroup = this.getHeaderGroupForQuery(query)
     const disabledTabs = []
     if (headerGroup.aar.length < 2) {
       disabledTabs.push('chronological')
     }
 
-    const chart = CHARTS[this.getChartKind()]
-    const ChartComponent = showTable ? CHARTS.table.component : chart.component
+    const chartKind = this.getChartKind()
 
-    if (!chart.component) {
-      throw new Error(`Uh oh, missing chart component for ${chart.name}`)
+    const chart = CHARTS[chartKind]
+    const ChartComponent = chart.component
+
+    if (!ChartComponent) {
+      return (
+        <div className="toggle-list__section toggle-list__section--expanded">
+          Error: No chart component for {JSON.stringify(chartKind)}
+        </div>
+      )
     }
 
-    const sortDirection = activeTab.name === 'benchmark' ? 'ascending' : null
+    const data = queryResultPresenter(query, queryResult, {
+      chartKind: chartKind,
+      dimensions: card.config.dimensions
+    })
 
-    let chartData = Object.assign({}, data)
-    if (activeTab.name == 'benchmark') {
-      chartData.highlight = {
+    if (chart.name == 'benchmark') {
+      data.highlight = {
         dimensionName: 'region',
         value: [region.prefixedCode]
       }
     }
-
-    if (showTable) {
-      chartData = this.tableFriendlyData(chartData, query, activeTab.name)
-    }
-
-    const clipboard = new Clipboard('.clipboardButton') // eslint-disable-line no-unused-vars
 
     return (
       <div
@@ -150,75 +140,62 @@ class Card extends Component {
       >
 
         {!printable && (
-        <TabBar
-          activeTab={activeTab}
-          disabledTabs={disabledTabs}
-          region={region}
-          tabs={TABS}
-          makeLinkToTab={tab => this.makeLinkToTab(tab)}
-        />
+          <TabBar
+            activeTab={activeTab}
+            disabledTabs={disabledTabs}
+            region={region}
+            tabs={TABS}
+            makeLinkToTab={tab => this.getUrlToTab(tab)}
+          />
         )}
 
         {!printable && (
-        <FilterBarContainer
-          query={query}
-          region={region}
-          card={card}
-          headerGroups={headerGroups}
-          tab={activeTab}
-          chart={chart}
-          config={card.config}
-          onChange={this.handleFilterChange.bind(this)}
-        />
+          <FilterBarContainer
+            query={query}
+            region={region}
+            card={card}
+            headerGroups={headerGroups}
+            tab={activeTab}
+            chart={CHARTS[activeTab.chartKind]}
+            config={card.config}
+            onChange={this.handleFilterChange.bind(this)}
+          />
         )}
 
         {loading && <span><i className="loading-indicator"/> Laster…</span>}
 
         {!printable && (
-        <div className="graph__types">
-          <ul className="tabs-mini">
-            <li className="tabs-mini__item">
-              {showTable && (
-              <a href="#" className="tabs-mini__link tabs-mini__link--current" onClick={this.handleTableToggle.bind(this)}>Figur</a>
-              )}
-              {!showTable && (
-              <span className="tabs-mini__link tabs-mini__link--current">Figur</span>
-              )}
-            </li>
-            <li className="tabs-mini__item">
-              {showTable && (
-              <span className="tabs-mini__link tabs-mini__link--current">Tabell</span>
-              )}
-              {!showTable && (
-              <a href="#" className="tabs-mini__link tabs-mini__link--current" onClick={this.handleTableToggle.bind(this)}>Tabell</a>
-              )}
-            </li>
-          </ul>
-        </div>
+          <ChartViewModeSelect
+            mode={chartViewMode}
+            onChange={newMode => this.setState({chartViewMode: newMode})}
+          />
         )}
 
         <div className="graph">
-          {data && <ChartComponent data={chartData} sortDirection={sortDirection}/>}
+          {data && <ChartComponent ref="chart" data={data} sortDirection={chartKind === 'benchmark' && 'ascending'}/>}
         </div>
+
         <ChartDescriptionContainer
           query={query}
           region={region}
           card={card}
           headerGroups={headerGroups}
         />
+
         {!printable && (
-        <div className="graph__functions">
-          <ShareWidget chartUrl={this.chartUrl()}/>
-          <DownloadWidget region={region} query={query} headerGroups={headerGroups}/>
-        </div>
+          <div className="graph__functions">
+            <ShareWidget chartUrl={this.getShareUrl()}/>
+            <DownloadWidget region={region} query={query} headerGroups={headerGroups}/>
+          </div>
         )}
+
         {!printable && (
-        <CardMetadata
-          description={card.metadata.description}
-          terminology={card.metadata.terminology}
-          source={card.metadata.source}
-          measuredAt={card.metadata.source}
-        />
+          <CardMetadata
+            description={card.metadata.description}
+            terminology={card.metadata.terminology}
+            source={card.metadata.source}
+            measuredAt={card.metadata.source}
+          />
         )}
       </div>
     )
@@ -229,7 +206,7 @@ function mapStateToProps(state, ownProps) {
 
   const cardState = (state.cardState[ownProps.region.prefixedCode] || {})[ownProps.card.name]
 
-  if (cardState.initializing) {
+  if (!cardState || cardState.initializing) {
     return {loading: true}
   }
 
@@ -253,10 +230,6 @@ function mapStateToProps(state, ownProps) {
     headerGroups,
     allRegions: state.allRegions,
     queryResult: queryResult,
-    data: !loading && queryResultPresenter(query, queryResult, {
-      chartKind: activeTab.chartKind,
-      dimensions: ownProps.card.config.dimensions
-    }),
     query
   }
 }

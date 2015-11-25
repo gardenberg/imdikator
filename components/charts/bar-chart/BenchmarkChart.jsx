@@ -106,7 +106,7 @@ export default class BenchmarkChart extends React.Component {
     })
 
     svg.append('rect')
-    .attr('class', 'benchmarkBackground')
+    .attr('class', 'chart__background chart__background--benchmark')
     .attr('width', '100%')
     .attr('height', '100%')
 
@@ -114,11 +114,11 @@ export default class BenchmarkChart extends React.Component {
     this.addYAxis(yc.scale, yc.axisFormat)
 
     // Draw the bars
-    svg.selectAll('rect.glanceBar')
+    svg.selectAll('rect.chart__bar.chart__bar--benchmark')
     .data(data.preparedData)
     .enter()
     .append('rect')
-    .attr('class', 'glanceBar')
+    .attr('class', 'chart__bar chart__bar--benchmark')
     .attr('x', dataItem => x(dataItem.title))
     .attr('y', dataItem => {
       return y(dataItem.value)
@@ -148,15 +148,16 @@ export default class BenchmarkChart extends React.Component {
       hoveropen = false
     }
 
-    svg.selectAll('rect.hover')
+    svg.selectAll('rect.chart__bar-hover')
     .data(data.preparedData)
     .enter()
     .append('svg:a')
     .attr('xlink:href', 'javascript://') // eslint-disable-line no-script-url
+    .attr('aria-label', item => item.title + ' ' + item.formattedValue) // For screenreaders
     .on('click', () => d3.event.stopPropagation())
     .on('focus', item => open(item))
     .append('rect')
-    .attr('class', 'hover')
+    .attr('class', 'chart__bar-hover')
     .attr('x', dataItem => x(dataItem.title))
     .attr('y', 0)
     .attr('width', dataItem => x.rangeBand())
